@@ -42,17 +42,6 @@ keypoints = detector.detect(img1)
 pts1 = np.array([x.pt for x in keypoints], dtype=np.float32)
 ```
 
-SIFT (scale invariant feature detector) is one of many feature detectors, which applies a difference-of- Gaussian (DoG) operator on the entire image, followed by a nonmaxima supression on its output to detect the features. It achieves scale invariance by applying the detector on lower-scale and upper-scale versions of the image. You are not expected to know all the details of SIFT here.
-
-Every detected keypoint is then associated with a description of the neighborhood it belongs to, which is called a descriptor. These descriptors are then used for searching for corresponding features in other images based on a similarity measure.
-An alternative way to independently finding features in all candidate images and then matching them is to use a detect-then-track approach. Features are detected in the first image, and then tracked over the next set of images. For this, use OpenCV’s Lukas-Kanade tracker.
-
-```
-pts2, status = cv2.calcOpticalFlowPyrLK(img1,img2,pts1)
-pts1 = pts1[status == 1]
-pts2 = pts2[status == 1]
-```
-
 The function computes the location of the points from the first image in the second image, by computing their ’optical flow’, or simply their apparent motion. This optical flow is computed by applying the Lukas-Kande algorithm, an algorithm that uses spatial and temporal image gradients to compute the motion of the points (hence their locations). It also makes the assumption that nearby point have the same motion. Note that some features will eventually move out of the field-of-view, and tracks will be lost, so make sure to detect new features when the number of features goes below a threshold (say, 150).
 
 As mentioned earlier, the main task is motion computation. Using these feature correspondences, imple- ment the 8-point algorithm for fundamental matrix estimation. Implement it inside a RANSAC scheme to get rid of any outliers, as explained in class. Then, compute the essential matrix, and decompose it to the relative R and t using cv2.recoverPose(E, points1, points2, K, R, t[, mask]). Note that the function returns the R and t of the first camera with respect to the second, and not the other way around (The joys of working in robotics :’)).
